@@ -17,12 +17,23 @@ router.get('/', async (req, res) => {
 router.post('/new', async (req, res) => {
   try {
     const newImage = new Image(req.body);
+    
+    // Find the existing featured image and update it to not be featured
+    if (newImage.isFeatured) {
+      const existingFeaturedImage = await Image.findOne({ isFeatured: true });
+      if (existingFeaturedImage) {
+        existingFeaturedImage.isFeatured = false;
+        await existingFeaturedImage.save();
+      }
+    }
+    
     const savedImage = await newImage.save();
     res.status(201).json(savedImage);
   } catch (error) {
     res.status(400).json({ error: 'Error adding image' });
   }
 });
+
 
 // Delete an image => /api/v1/images/:id
 router.delete('/:id', async (req, res) => {
