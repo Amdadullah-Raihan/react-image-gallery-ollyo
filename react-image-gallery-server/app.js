@@ -1,5 +1,6 @@
 // Import required modules
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
@@ -15,6 +16,20 @@ const port = process.env.PORT || 5000;
 // Middleware setup
 app.use(express.json()); // Parse JSON request bodies
 app.use(cors()); // Enable Cross-Origin Resource Sharing
+
+// MongoDB connection
+mongoose.connect(`${process.env.DB_URL}`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(()=>{
+    console.log('Database connection established...');
+})
+ .catch(err => {
+        console.log("Error connecting to Database... " + err)
+    });
+
+
 
 // Default route
 app.get('/', (req, res) => {
