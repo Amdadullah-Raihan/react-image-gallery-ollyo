@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+
+
+
 // Load environment variables from a .env file
 dotenv.config();
 
@@ -35,6 +38,12 @@ mongoose.connect(`${process.env.DB_URL}`, {
 app.get('/', (req, res) => {
     res.send('React Image Gallery Server is Running');
 });
+
+
+// Routes 
+
+app.use('/api/v1/images', require('./routes/images'));
+
 
 // Start the server and listen on the defined port
 app.listen(port, () => {

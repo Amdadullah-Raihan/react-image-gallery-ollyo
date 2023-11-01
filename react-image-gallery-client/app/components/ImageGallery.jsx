@@ -2,12 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import imagesData from '../../public/images.json';
 import { ToastContainer, toast } from 'react-toastify';
- import 'react-toastify/dist/ReactToastify.css';
+import AddImageModal from './AddImageModal';
+import { BsImage } from 'react-icons/bs'
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import useApiUrl from '../hooks/useApiUrl';
 
 const ImageGallery = () => {
   const [images, setImages] = useState([])
   const [selectedImages, setSelectedImages] = useState([]);
    const [isHovering, setIsHovering] = useState(null);
+   const apiUrl = useApiUrl();
 
   console.log('isHovering', isHovering);
   
@@ -26,7 +31,7 @@ const ImageGallery = () => {
     const handleDeleteSelected = () => {
       
     // Filter out the selected images from the images array
-    const updatedImages = images.filter((image) => !selectedImages.includes(image.id));
+    const updatedImages = images.filter((image) => !selectedImages.includes(image._id));
     setImages(updatedImages)
 
     // Set the selectedImages array to an empty array
@@ -36,14 +41,15 @@ const ImageGallery = () => {
   };
 
  useEffect(() => {
-  // Sort the images array so that featured images appear first
-  const sortedImages = [...imagesData].sort((a, b) => {
-    if (a.isFeatured && !b.isFeatured) return -1; // 'a' comes before 'b'
-    if (!a.isFeatured && b.isFeatured) return 1;  // 'b' comes before 'a'
-    return 0;  // No change in order
-  });
+  axios.get(`${apiUrl}/api/v1/images`)
+  .then((response) => {
+    setImages(response.data);
 
-  setImages(sortedImages);
+    console.log('result', response);
+  })
+.catch((error) => {
+    console.error('Error getting images:', error);
+  });
 }, []);
 
 
@@ -68,29 +74,34 @@ const ImageGallery = () => {
           key={index}
           className={`relative p-4 bg-white rounded-lg shadow cursor-pointer ${
             index === 0 && 'row-span-2 col-span-2'
-          } hover:bg-gray-100`}
-          onClick={() => handleSelected(image.id)}
-           onMouseEnter={() => setIsHovering(image.id)}
+          } hover:bg-gray-300`}
+          onClick={() => handleSelected(image._id)}
+           onMouseEnter={() => setIsHovering(image._id)}
               onMouseLeave={() => setIsHovering(null)}
           
         >
         
   <input
   type="checkbox"
-  checked={selectedImages.includes(image.id)}
-  className={` absolute top-4 left-4 checkbox ${selectedImages.includes(image.id) || (isHovering === image.id && !selectedImages.includes(image.id)) ? 'block' : 'hidden'}`}
+  checked={selectedImages.includes(image._id)}
+  className={` absolute top-4 left-4 checkbox ${selectedImages.includes(image._id) || (isHovering === image._id && !selectedImages.includes(image._id)) ? 'block' : 'hidden'}`}
 />
 
 
           
         
-          <img src={image.src} alt={image.alt} />
+          <img src={image.url} alt={image.alt} />
         </div>
         
       ))}
-      <button className='bg-white rounded-lg shadow'> Add Image</button>
+     <button className="flex flex-col justify-center items-center h-full w-full bg-white rounded-lg border border-2 border-dashed border-gray-400 text-gray-700 font-bold hover:bg-gray-200" onClick={() => document.getElementById('my_modal_3').showModal()}>
+      <BsImage/>
+  Add Image
+</button>
+
     </div>
     <ToastContainer/>
+    <AddImageModal/>
    </div>
   );
 };

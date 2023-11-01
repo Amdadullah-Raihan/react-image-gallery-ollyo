@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'React Image Gallery',
+  title: 'Image Gallery',
   description: 'Created by Amdadul Islam ',
 }
 

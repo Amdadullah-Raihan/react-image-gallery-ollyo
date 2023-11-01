@@ -1,7 +1,7 @@
 // routes/imageRoutes.js
 const express = require('express');
 const router = express.Router();
-const Image = require('../models/Image');
+const Image = require('../models/images');
 
 // Get all images => /api/v1/images
 router.get('/', async (req, res) => {
