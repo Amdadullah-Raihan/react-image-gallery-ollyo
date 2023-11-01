@@ -35,26 +35,41 @@ router.post('/new', async (req, res) => {
 });
 
 
-// Delete an image => /api/v1/images/:id
-router.delete('/:id', async (req, res) => {
+// Delete selected images => /api/v1/images/delete
+router.post('/delete', async (req, res) => {
   try {
-    await Image.findByIdAndRemove(req.params.id);
-    res.json({ message: 'Image deleted' });
+    const { imageIds } = req.body;
+    await Image.deleteMany({ _id: { $in: imageIds } });
+    res.json({
+        success: true,
+         message: 'Images deleted'
+        });
   } catch (error) {
-    res.status(400).json({ error: 'Error deleting image' });
+    res.status(400).json({ message: 'Error deleting images' });
   }
 });
 
-// Update the feature status of an image => /api/v1/images/:id
-router.put('/:id', async (req, res) => {
+// Make an image featured => /api/v1/images/:id/make-featured
+router.put('/:id/make-featured', async (req, res) => {
   try {
-    const image = await Image.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.json(image);
+    const { id } = req.params;
+
+    // Find the currently featured image and set isFeatured to false
+    const currentlyFeaturedImage = await Image.findOne({ isFeatured: true });
+
+    if (currentlyFeaturedImage) {
+      currentlyFeaturedImage.isFeatured = false;
+      await currentlyFeaturedImage.save();
+    }
+
+    // Update the selected image as featured
+    const updatedImage = await Image.findByIdAndUpdate(id, { isFeatured: true }, { new: true });
+    
+    res.json(updatedImage);
   } catch (error) {
-    res.status(400).json({ error: 'Error updating image' });
+    res.status(400).json({ error: 'Error making the image featured' });
   }
 });
+
 
 module.exports = router;
