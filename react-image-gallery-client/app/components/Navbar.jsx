@@ -19,7 +19,7 @@ const Navbar = ({
       {selectedImages.length === 1 && !alreadyFeatured && (
         <button
           className="btn btn-sm text-green-500"
-          onClick={handleMakeFeatured}
+          onClick={() => handleMakeFeatured("")}
         >
           Make Featured
         </button>

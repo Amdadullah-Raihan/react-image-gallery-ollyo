@@ -12,7 +12,7 @@ import ImageItem from "./ImageGrid";
 import AddImageBtn from "./AddImageBtn";
 import Navbar from "./Navbar";
 import { Oval } from "react-loader-spinner";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 const ImageGallery = () => {
   const [alreadyFeatured, setAlreadyFeatured] = useState(false);
@@ -75,10 +75,15 @@ const ImageGallery = () => {
       });
   };
 
-  const handleMakeFeatured = () => {
+  const handleMakeFeatured = (imgId) => {
     // Ensure that only one image is selected
-    if (selectedImages.length === 1) {
-      const imageId = selectedImages[0];
+    if (selectedImages.length === 1 || imgId) {
+      let imageId;
+      if (imgId) {
+        imageId = imgId;
+      } else {
+        imageId = selectedImages[0];
+      }
 
       axios
         .put(`${apiUrl}/api/v1/images/${imageId}/make-featured`)
@@ -120,6 +125,32 @@ const ImageGallery = () => {
     }
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return; // No change in position
+    }
+
+    const reorderedItems = [...images];
+    const [movedItem] = reorderedItems.splice(result.source.index, 1);
+    reorderedItems.splice(result.destination.index, 0, movedItem);
+
+    reorderedItems.forEach((item, index) => {
+      item.position = index;
+    });
+
+    setImages(reorderedItems);
+    setSelectedImages(result.draggableId);
+
+    console.log(result);
+
+    if (result.destination.index === 0) {
+      handleMakeFeatured(result.draggableId);
+      setSelectedImages([]);
+    } else {
+      setSelectedImages([]);
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -137,8 +168,8 @@ const ImageGallery = () => {
           />
 
           {/* Images Grids */}
-          <DragDropContext onDragEnd={() => {}}>
-            <Droppable droppableId="ImagesGallery">
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="images">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
@@ -146,19 +177,31 @@ const ImageGallery = () => {
                   className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-4 md:p-8"
                 >
                   {images.map((image, index) => (
-                    <ImageItem
+                    <Draggable
                       key={image._id}
-                      droppableId={image._id}
+                      draggableId={image._id}
                       index={index}
-                      image={image}
-                      handleSelected={handleSelected}
-                      selectedImages={selectedImages}
-                      isHovering={isHovering}
-                      setIsHovering={setIsHovering}
-                    />
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <ImageItem
+                            index={index}
+                            image={image}
+                            handleSelected={handleSelected}
+                            selectedImages={selectedImages}
+                            isHovering={isHovering}
+                            setIsHovering={setIsHovering}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
                   ))}
-                  <AddImageBtn />
                   {provided.placeholder}
+                  <AddImageBtn />
                 </div>
               )}
             </Droppable>
