@@ -20,7 +20,6 @@ const ImageGrid = ({
       whileHover={{ scale: 1.05 }}
       className={`
         image-item relative flex items-center justify-center bg-white rounded-lg border cursor-pointer overflow-hidden hover:z-10 
-        ${image.isFeatured && "row-span-2 col-span-2"}
       `}
       onClick={() => handleSelected(image._id)}
       onMouseEnter={() => setIsHovering(image._id)}
@@ -40,7 +39,7 @@ const ImageGrid = ({
           checkbox ${
             selectedImages.includes(image._id) ||
             (isHovering === image._id && !selectedImages.includes(image._id))
-              ? "block"
+              ? "block "
               : "hidden"
           }
         `}

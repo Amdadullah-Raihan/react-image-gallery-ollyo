@@ -11,7 +11,7 @@ const AddImageBtn = () => {
         items-center
         h-full
         w-full
-        min-h-[215px]
+        py-14
         bg-white
         rounded-lg
         border-2

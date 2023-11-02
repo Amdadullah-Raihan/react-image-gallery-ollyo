@@ -16,6 +16,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 const ImageGallery = () => {
   const [alreadyFeatured, setAlreadyFeatured] = useState(false);
+  const [isSelectedAll, setSelectedAll] = useState(false);
   const apiUrl = useApiUrl(false);
   const [
     images,
@@ -37,6 +38,14 @@ const ImageGallery = () => {
       // If the image is not selected, add it to the selectedImages array
       setSelectedImages([...selectedImages, id]);
     }
+  };
+
+  // Function to toggle "Select All"
+  const toggleSelectAll = () => {
+    const allImageIds = images.map((image) => image._id);
+    const updatedSelectedImages = isSelectedAll ? [] : allImageIds;
+    setSelectedImages(updatedSelectedImages);
+    setSelectedAll(!isSelectedAll);
   };
 
   useEffect(() => {
@@ -129,7 +138,14 @@ const ImageGallery = () => {
     if (!result.destination) {
       return; // No change in position
     }
-
+    // combining item
+    if (result.combine) {
+      // super simple: just removing the dragging item
+      const items = [...items];
+      items.splice(result.source.index, 1);
+      setImages({ items });
+      return;
+    }
     const reorderedItems = [...images];
     const [movedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, movedItem);
@@ -140,8 +156,6 @@ const ImageGallery = () => {
 
     setImages(reorderedItems);
     setSelectedImages(result.draggableId);
-
-    console.log(result);
 
     if (result.destination.index === 0) {
       handleMakeFeatured(result.draggableId);
@@ -162,6 +176,7 @@ const ImageGallery = () => {
           {/* Navbar  */}
           <Navbar
             selectedImages={selectedImages}
+            toggleSelectAll={toggleSelectAll}
             handleMakeFeatured={handleMakeFeatured}
             handleDeleteSelected={handleDeleteSelected}
             alreadyFeatured={alreadyFeatured}
@@ -169,7 +184,7 @@ const ImageGallery = () => {
 
           {/* Images Grids */}
           <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="images">
+            <Droppable droppableId="images" direction="horizontal">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
@@ -179,14 +194,17 @@ const ImageGallery = () => {
                   {images.map((image, index) => (
                     <Draggable
                       key={image._id}
-                      draggableId={image._id}
                       index={index}
+                      draggableId={image._id}
                     >
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
+                          className={
+                            image.isFeatured && "row-span-2 col-span-2"
+                          }
                         >
                           <ImageItem
                             index={index}
