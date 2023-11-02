@@ -10,10 +10,16 @@ const AddImageModal = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [images, setImages] = useImages();
+  const [validUrl, setValidUrl] = useState(false);
   const apiUrl = useApiUrl();
 
   const handleImageUrlChange = (e) => {
     setImageUrl(e.target.value);
+    setValidUrl(isValidURL(e.target.value));
+  };
+  const isValidURL = (url) => {
+    const urlPattern = /^(https?|ftp?|http):\/\/[^\s/$.?#].[^\s]*$/;
+    return urlPattern.test(url);
   };
 
   const handleIsFeaturedChange = () => {
@@ -22,13 +28,15 @@ const AddImageModal = () => {
 
   const handleAddImage = async () => {
     try {
+      if (!imageUrl) {
+        toast.error("Please provide an Image URL");
+        return;
+      }
+
       const newImage = {
         url: imageUrl,
         isFeatured: isFeatured,
       };
-
-      if (isFeatured) {
-      }
 
       const response = await axios.post(
         `${apiUrl}/api/v1/images/new`,
@@ -41,10 +49,21 @@ const AddImageModal = () => {
       const previouslyFeaturedImage = images.find((image) => image.isFeatured);
 
       // Update the images state
-      const updatedImages = [
-        response.data,
-        ...images.filter((image) => image._id !== response.data._id),
-      ];
+      let updatedImages;
+
+      if (isFeatured) {
+        // If the new image is featured, place it at the beginning of the array
+        updatedImages = [
+          response.data,
+          ...images.filter((image) => image._id !== response.data._id),
+        ];
+      } else {
+        // If the new image is not featured, add it to the end of the array
+        updatedImages = [
+          ...images.filter((image) => image._id !== response.data._id),
+          response.data,
+        ];
+      }
 
       // If there was a previously featured image, set its isFeatured to false
       if (previouslyFeaturedImage) {
@@ -101,7 +120,11 @@ const AddImageModal = () => {
             </label>
           </div>
           <div className="w-full text-right mt-4 ">
-            <button className="btn btn-neutral " onClick={handleAddImage}>
+            <button
+              className="btn btn-neutral "
+              onClick={handleAddImage}
+              disabled={!validUrl}
+            >
               <RiImageAddLine className="text-lg" />
               Add Image
             </button>
