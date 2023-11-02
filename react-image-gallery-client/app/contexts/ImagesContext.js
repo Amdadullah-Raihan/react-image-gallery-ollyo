@@ -10,14 +10,14 @@ const ImagesContextProvider = ({children}) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [isHovering, setIsHovering] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sorting, setSorting] = useState(1);
   const apiUrl = useApiUrl();
-
 
 
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`${apiUrl}/api/v1/images`)
+      .get(`${apiUrl}/api/v1/images?sorting=${sorting}`)
       .then((response) => {
         const sortedImages = response.data.sort((a, b) => {
           // Move featured images to the beginning
@@ -31,8 +31,9 @@ const ImagesContextProvider = ({children}) => {
       .catch((error) => {
         console.error('Error getting images:', error);
       });
-  }, [apiUrl]);
+  }, [apiUrl, sorting]);
 
+  console.log("sorting values: " + sorting);
 
   return <ImagesContext.Provider
    value={[
@@ -43,6 +44,8 @@ const ImagesContextProvider = ({children}) => {
     isHovering, 
     setIsHovering,
     isLoading,
+    sorting,
+    setSorting
     
   ]}
    >

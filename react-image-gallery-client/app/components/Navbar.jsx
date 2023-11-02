@@ -9,20 +9,22 @@ const Navbar = ({
 }) => {
   const [images] = useImages();
   return (
-    <div className="px-8 py-4 bg-white border-b flex justify-between h-16">
-      <div className="flex items-center gap-x-2 font-bold">
-        <input
-          type="checkbox"
-          checked={selectedImages.length > 0 && "checked"}
-          className="checkbox"
-          onChange={toggleSelectAll}
-        />
-        {selectedImages.length > 0
-          ? selectedImages.length === images.length
-            ? "All"
-            : selectedImages.length
-          : "No"}{" "}
-        {selectedImages.length > 1 ? "Files" : "File"} Selected
+    <div className="px-4 lg:px-8 py-4 bg-white border-b flex justify-between h-16">
+      <div className="flex items-center gap-4 font-bold">
+        <div className="flex  items-center gap-2 ">
+          <input
+            type="checkbox"
+            checked={selectedImages.length > 0 && "checked"}
+            className="checkbox"
+            onChange={toggleSelectAll}
+          />
+          {selectedImages.length > 0
+            ? selectedImages.length === images.length
+              ? "All"
+              : selectedImages.length
+            : "No"}{" "}
+          {selectedImages.length > 1 ? "Files" : "File"} Selected
+        </div>
       </div>
       {selectedImages.length === 1 && !alreadyFeatured && (
         <button

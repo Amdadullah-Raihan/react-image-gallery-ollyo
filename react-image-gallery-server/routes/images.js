@@ -5,8 +5,9 @@ const Image = require('../models/images');
 
 // Get all images => /api/v1/images
 router.get('/', async (req, res) => {
+  const order = parseInt(req.query.sorting);
   try {
-    const images = await Image.find();
+    const images = await Image.find().sort({createdAt: order});
     res.json(images);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving images' });

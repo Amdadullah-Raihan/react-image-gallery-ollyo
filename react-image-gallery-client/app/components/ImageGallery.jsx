@@ -26,6 +26,8 @@ const ImageGallery = () => {
     isHovering,
     setIsHovering,
     isLoading,
+    sorting,
+    setSorting,
   ] = useImages();
 
   const handleSelected = (id) => {
@@ -224,7 +226,20 @@ const ImageGallery = () => {
               )}
             </Droppable>
           </DragDropContext>
-
+          {/* sorting */}
+          <div className="absolute top-12 lg:top-4  right-2 lg:right-4  z-10">
+            <select
+              className="select select-bordered w-full select-xs max-w-xs"
+              value={sorting}
+              onChange={(e) => setSorting(e.target.value)}
+            >
+              <option disabled selected>
+                Sort by date
+              </option>
+              <option value={1}>Ascending </option>
+              <option value={-1}>Descending</option>
+            </select>
+          </div>
           {/* These components will be triggered on specific events */}
           <ToastContainer />
           <AddImageModal />
