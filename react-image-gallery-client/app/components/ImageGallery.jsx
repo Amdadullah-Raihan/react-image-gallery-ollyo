@@ -7,13 +7,24 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import useApiUrl from "../hooks/useApiUrl";
 import { useImages } from "../contexts/ImagesContext";
+import { motion } from "framer-motion";
+import ImageItem from "./ImageGrid";
+import AddImageBtn from "./AddImageBtn";
+import Navbar from "./Navbar";
+import { Oval } from "react-loader-spinner";
 
 const ImageGallery = () => {
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [isHovering, setIsHovering] = useState(null);
   const [alreadyFeatured, setAlreadyFeatured] = useState(false);
-  const [images, setImages] = useImages();
-  const apiUrl = useApiUrl();
+  const apiUrl = useApiUrl(false);
+  const [
+    images,
+    setImages,
+    selectedImages,
+    setSelectedImages,
+    isHovering,
+    setIsHovering,
+    isLoading,
+  ] = useImages();
 
   const handleSelected = (id) => {
     const isSelected = selectedImages.includes(id);
@@ -27,11 +38,21 @@ const ImageGallery = () => {
     }
   };
 
+  useEffect(() => {
+    if (selectedImages.length === 1) {
+      const img = images.filter((img) => img._id === selectedImages[0]);
+
+      if (img[0].isFeatured) {
+        setAlreadyFeatured(true);
+      } else {
+        setAlreadyFeatured(false);
+      }
+    }
+  }, [selectedImages]);
+
   const handleDeleteSelected = () => {
-    // Create an array of image IDs to delete
     const imageIdsToDelete = selectedImages;
 
-    // Send a POST request to delete one or multiple images
     axios
       .post(`${apiUrl}/api/v1/images/delete`, { imageIds: imageIdsToDelete })
       .then((response) => {
@@ -56,7 +77,6 @@ const ImageGallery = () => {
   const handleMakeFeatured = () => {
     // Ensure that only one image is selected
     if (selectedImages.length === 1) {
-      // Send a PUT request to update the image as featured
       const imageId = selectedImages[0];
 
       axios
@@ -99,88 +119,43 @@ const ImageGallery = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedImages.length === 1) {
-      const img = images.filter((img) => img._id === selectedImages[0]);
-
-      if (img[0].isFeatured) {
-        setAlreadyFeatured(true);
-      } else {
-        setAlreadyFeatured(false);
-      }
-    }
-  }, [selectedImages]);
-
   return (
-    <div className="m-16 bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-8 py-4 bg-white  border-b 2 flex justify-between">
-        <div className="flex items-center gap-2 font-bold">
-          <input
-            type="checkbox"
-            checked={selectedImages.length > 0 && "checked"}
-            className="checkbox"
+    <>
+      {isLoading ? (
+        <div className="w-full h-screen  flex items-center justify-center">
+          <Oval height="80" width="80" borderColor="black" barColor="gray" />
+        </div>
+      ) : (
+        <div className="lg:m-16 bg-white  rounded-lg shadow overflow-hidden ">
+          {/* Navbar  */}
+          <Navbar
+            selectedImages={selectedImages}
+            handleMakeFeatured={handleMakeFeatured}
+            handleDeleteSelected={handleDeleteSelected}
+            alreadyFeatured={alreadyFeatured}
           />
-          {selectedImages.length > 0 ? selectedImages.length : "No"}{" "}
-          {selectedImages.length > 1 ? "Files" : "File"} Selected
-        </div>
 
-        {selectedImages.length === 1 && !alreadyFeatured && (
-          <button
-            className="btn btn-sm text-green-500"
-            onClick={handleMakeFeatured}
-          >
-            Make Featured
-          </button>
-        )}
-        <div>
-          <button
-            onClick={handleDeleteSelected}
-            className="text-rose-400 font-bold disabled:text-rose-200"
-            disabled={selectedImages.length < 1 && true}
-          >
-            Delete {selectedImages.length > 1 ? "Files" : "File"}
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-8">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={`relative p-4 bg-white rounded-lg border cursor-pointer ${
-              image.isFeatured &&
-              "row-span-2 col-span-2 min-h-[500px] bg-orange-100"
-            } hover:bg-gray-300`}
-            onClick={() => handleSelected(image._id)}
-            onMouseEnter={() => setIsHovering(image._id)}
-            onMouseLeave={() => setIsHovering(null)}
-          >
-            <input
-              type="checkbox"
-              checked={selectedImages.includes(image._id)}
-              className={`absolute top-4 left-4 checkbox ${
-                selectedImages.includes(image._id) ||
-                (isHovering === image._id &&
-                  !selectedImages.includes(image._id))
-                  ? "block"
-                  : "hidden"
-              }`}
-            />
-
-            <img src={image.url} alt={image.alt} className="w-full  " />
+          {/* Sigle Img */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-4 md:p-8">
+            {images.map((image, index) => (
+              <ImageItem
+                key={index}
+                image={image}
+                handleSelected={handleSelected}
+                selectedImages={selectedImages}
+                isHovering={isHovering}
+                setIsHovering={setIsHovering}
+              />
+            ))}
+            <AddImageBtn />
           </div>
-        ))}
-        <button
-          className="flex flex-col justify-center items-center h-full w-full min-h-[250px] bg-white rounded-lg border border-2 border-dashed border-gray-400 text-gray-700 font-bold hover:bg-gray-200"
-          onClick={() => document.getElementById("my_modal_3").showModal()}
-        >
-          <BsImage />
-          Add Image
-        </button>
-      </div>
-      <ToastContainer />
-      <AddImageModal />
-    </div>
+
+          {/* These components will be triggered on specific events */}
+          <ToastContainer />
+          <AddImageModal />
+        </div>
+      )}
+    </>
   );
 };
 

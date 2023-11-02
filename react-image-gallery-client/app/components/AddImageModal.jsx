@@ -27,12 +27,14 @@ const AddImageModal = () => {
         isFeatured: isFeatured,
       };
 
+      if (isFeatured) {
+      }
+
       const response = await axios.post(
         `${apiUrl}/api/v1/images/new`,
         newImage
       );
 
-      console.log("Image added:", response.data);
       toast.success("Image added successfully");
 
       setImages((prevImages) => [...prevImages, response.data]);
@@ -40,6 +42,7 @@ const AddImageModal = () => {
       clearForm();
     } catch (error) {
       console.error("Error adding image:", error.message);
+      toast.error("Error adding image");
       // Handle the error if needed
     }
   };

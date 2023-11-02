@@ -7,11 +7,15 @@ const ImagesContext = createContext();
 
 const ImagesContextProvider = ({children}) => {
   const [images, setImages] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [isHovering, setIsHovering] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const apiUrl = useApiUrl();
 
 
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get(`${apiUrl}/api/v1/images`)
       .then((response) => {
@@ -22,8 +26,7 @@ const ImagesContextProvider = ({children}) => {
           return 0;
         });
         setImages(sortedImages);
-
-     
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error('Error getting images:', error);
@@ -31,7 +34,18 @@ const ImagesContextProvider = ({children}) => {
   }, [apiUrl]);
 
 
-  return <ImagesContext.Provider value={[images,setImages]}>
+  return <ImagesContext.Provider
+   value={[
+    images,
+    setImages, 
+    selectedImages, 
+    setSelectedImages, 
+    isHovering, 
+    setIsHovering,
+    isLoading,
+    
+  ]}
+   >
     {children}
   </ImagesContext.Provider>
 }
