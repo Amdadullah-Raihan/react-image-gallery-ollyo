@@ -37,8 +37,26 @@ const AddImageModal = () => {
 
       toast.success("Image added successfully");
 
-      setImages((prevImages) => [...prevImages, response.data]);
+      // Get the previously featured image
+      const previouslyFeaturedImage = images.find((image) => image.isFeatured);
 
+      // Update the images state
+      const updatedImages = [
+        response.data,
+        ...images.filter((image) => image._id !== response.data._id),
+      ];
+
+      // If there was a previously featured image, set its isFeatured to false
+      if (previouslyFeaturedImage) {
+        const index = updatedImages.findIndex(
+          (image) => image._id === previouslyFeaturedImage._id
+        );
+        if (index !== -1) {
+          updatedImages[index].isFeatured = false;
+        }
+      }
+
+      setImages(updatedImages);
       clearForm();
     } catch (error) {
       console.error("Error adding image:", error.message);
