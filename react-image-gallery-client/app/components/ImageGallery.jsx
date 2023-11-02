@@ -12,6 +12,7 @@ import ImageItem from "./ImageGrid";
 import AddImageBtn from "./AddImageBtn";
 import Navbar from "./Navbar";
 import { Oval } from "react-loader-spinner";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 const ImageGallery = () => {
   const [alreadyFeatured, setAlreadyFeatured] = useState(false);
@@ -135,20 +136,33 @@ const ImageGallery = () => {
             alreadyFeatured={alreadyFeatured}
           />
 
-          {/* Sigle Img */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-4 md:p-8">
-            {images.map((image, index) => (
-              <ImageItem
-                key={index}
-                image={image}
-                handleSelected={handleSelected}
-                selectedImages={selectedImages}
-                isHovering={isHovering}
-                setIsHovering={setIsHovering}
-              />
-            ))}
-            <AddImageBtn />
-          </div>
+          {/* Images Grids */}
+          <DragDropContext onDragEnd={() => {}}>
+            <Droppable droppableId="ImagesGallery">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-4 md:p-8"
+                >
+                  {images.map((image, index) => (
+                    <ImageItem
+                      key={image._id}
+                      droppableId={image._id}
+                      index={index}
+                      image={image}
+                      handleSelected={handleSelected}
+                      selectedImages={selectedImages}
+                      isHovering={isHovering}
+                      setIsHovering={setIsHovering}
+                    />
+                  ))}
+                  <AddImageBtn />
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
           {/* These components will be triggered on specific events */}
           <ToastContainer />
