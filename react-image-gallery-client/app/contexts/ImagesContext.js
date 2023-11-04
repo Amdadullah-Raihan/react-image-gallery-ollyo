@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import useApiUrl from '../hooks/useApiUrl';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const ImagesContext = createContext();
 
@@ -14,6 +15,7 @@ const ImagesContextProvider = ({children}) => {
   const apiUrl = useApiUrl();
 
 
+  // UseEffects to load images 
   useEffect(() => {
     setIsLoading(true);
     axios
@@ -30,10 +32,11 @@ const ImagesContextProvider = ({children}) => {
       })
       .catch((error) => {
         console.error('Error getting images:', error);
+        
       });
   }, [apiUrl, sorting]);
 
-  console.log("sorting values: " + sorting);
+
 
   return <ImagesContext.Provider
    value={[
@@ -53,9 +56,6 @@ const ImagesContextProvider = ({children}) => {
   </ImagesContext.Provider>
 }
 
+export const useImages = () =>  useContext(ImagesContext);
+
 export default ImagesContextProvider
-
-
-export const useImages = () => {
-    return useContext(ImagesContext);
-}

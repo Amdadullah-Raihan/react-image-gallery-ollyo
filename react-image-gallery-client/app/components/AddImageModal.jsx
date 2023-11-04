@@ -17,6 +17,7 @@ const AddImageModal = () => {
     setImageUrl(e.target.value);
     setValidUrl(isValidURL(e.target.value));
   };
+
   const isValidURL = (url) => {
     const urlPattern = /^(https?|ftp?|http):\/\/[^\s/$.?#].[^\s]*$/;
     return urlPattern.test(url);

@@ -1,6 +1,7 @@
 import React from "react";
 import { useImages } from "../contexts/ImagesContext";
 import { FaTrash } from "react-icons/fa6";
+
 const Navbar = ({
   selectedImages,
   handleMakeFeatured,
@@ -23,7 +24,8 @@ const Navbar = ({
             ? "All"
             : selectedImages.length
           : "No"}{" "}
-        {selectedImages.length > 1 ? "Files" : "File"} Selected
+        {selectedImages.length > 1 ? "Files" : "File"}{" "}
+        <span className="hidden sm:block">Selected</span>
       </div>
 
       <div>
@@ -36,11 +38,20 @@ const Navbar = ({
           </button>
         )}
       </div>
-      <div>
+
+      <div
+        className="tooltip  tooltip-left"
+        data-tip={
+          selectedImages.length < 1
+            ? "Select at Least 1 File"
+            : "Delete Selected"
+        }
+      >
         <button
           onClick={handleDeleteSelected}
-          className="ml-12 sm:ml-0 text-rose-400 font-bold disabled:text-rose-200"
+          className="border border-rose-500  px-4 py-1 rounded-md ml-12 sm:ml-0 text-rose-400 font-bold disabled:text-rose-200 disabled:border-rose-200"
           disabled={selectedImages.length < 1 && true}
+          title="Delete Selected"
         >
           <FaTrash className="text-xl" />
           {/* Delete {selectedImages.length > 1 ? "Files" : "File"} */}

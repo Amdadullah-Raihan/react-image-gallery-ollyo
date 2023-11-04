@@ -11,8 +11,8 @@ import { motion } from "framer-motion";
 import ImageItem from "./ImageGrid";
 import AddImageBtn from "./AddImageBtn";
 import Navbar from "./Navbar";
-import { Oval } from "react-loader-spinner";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import Loading from "./Loading";
 
 const ImageGallery = () => {
   const [alreadyFeatured, setAlreadyFeatured] = useState(false);
@@ -127,7 +127,7 @@ const ImageGallery = () => {
           setImages(updatedImages);
           setSelectedImages([]);
 
-          toast.success("Image set as featured");
+          toast.success("Updated Featured Image");
         })
         .catch((error) => {
           console.error("Error making the image featured:", error);
@@ -163,9 +163,7 @@ const ImageGallery = () => {
   return (
     <>
       {isLoading ? (
-        <div className="w-full h-screen  flex items-center justify-center">
-          <Oval height="80" width="80" borderColor="black" barColor="gray" />
-        </div>
+        <Loading />
       ) : (
         <div className="lg:m-16 bg-white  rounded-lg shadow overflow-hidden ">
           {/* Navbar  */}
@@ -222,13 +220,13 @@ const ImageGallery = () => {
             </Droppable>
           </DragDropContext>
           {/* sorting */}
-          <div className="absolute top-12 lg:top-4  right-2 lg:right-4  z-10">
+          <div className="absolute top-[55px] lg:top-4  right-1 lg:right-4  z-10">
             <select
               className="select select-bordered w-full select-xs max-w-xs"
               value={sorting}
               onChange={(e) => setSorting(e.target.value)}
             >
-              <option disabled selected>
+              <option disabled defaultValue={1}>
                 Sort by date
               </option>
               <option value={1}>Ascending </option>
