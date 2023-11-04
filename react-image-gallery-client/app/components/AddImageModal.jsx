@@ -66,7 +66,7 @@ const AddImageModal = () => {
       }
 
       // If there was a previously featured image, set its isFeatured to false
-      if (previouslyFeaturedImage) {
+      if (isFeatured && previouslyFeaturedImage) {
         const index = updatedImages.findIndex(
           (image) => image._id === previouslyFeaturedImage._id
         );

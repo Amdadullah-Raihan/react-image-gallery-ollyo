@@ -140,14 +140,7 @@ const ImageGallery = () => {
     if (!result.destination) {
       return; // No change in position
     }
-    // combining item
-    if (result.combine) {
-      // super simple: just removing the dragging item
-      const items = [...items];
-      items.splice(result.source.index, 1);
-      setImages({ items });
-      return;
-    }
+
     const reorderedItems = [...images];
     const [movedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, movedItem);
@@ -187,11 +180,11 @@ const ImageGallery = () => {
           {/* Images Grids */}
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="images" direction="horizontal">
-              {(provided) => (
+              {(provided, snapshot) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-4 md:p-8"
+                  className={`grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-4 p-4 md:p-8`}
                 >
                   {images.map((image, index) => (
                     <Draggable
@@ -204,9 +197,11 @@ const ImageGallery = () => {
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={
-                            image.isFeatured && "row-span-2 col-span-2"
-                          }
+                          className={`
+                 
+                           ${image.isFeatured && "row-span-2 col-span-2 "}
+                         
+                          `}
                         >
                           <ImageItem
                             index={index}
